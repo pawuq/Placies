@@ -18,4 +18,8 @@
         <ProjectReference Include="..\..\Multiformats\Placies.Cid\Placies.Cid.fsproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="System.IO.Pipelines" />
+    </ItemGroup>
+
 </Project>

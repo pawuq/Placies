@@ -93,20 +93,23 @@ type DagPbIpldCodec() =
     interface IIpldCodec with
         member this.CodecInfo = MultiCodecInfos.DagPb
 
-        member this.TryDecodeAsync(stream) = taskResult {
+        member this.TryDecodeAsync(pipeReader) = taskResult {
             use memoryStream = new MemoryStream()
-            do! stream.CopyToAsync(memoryStream)
+            do! pipeReader.CopyToAsync(memoryStream)
             let mutable buffer = ReadOnlyMemory(memoryStream.ToArray())
             let! pbNode = DagPbDecode.decodeNode buffer
             return DagPb.pbNodeToDataModel pbNode
         }
 
-        member this.TryEncodeAsync(writeToStream, dataModelNode) = taskResult {
+        member this.TryEncodeAsync(pipeWriter, dataModelNode) = taskResult {
             let! pbNode =
                 DagPb.parseDataModelToPbNode dataModelNode
                 |> Result.mapError (fun errs -> AggregateException("Invalid dag-pb data model", errs |> Seq.map exn) :> exn)
             let bufferWriter = ArrayBufferWriter()
             DagPbEncode.writeNode pbNode bufferWriter
-            do! writeToStream.WriteAsync(bufferWriter.WrittenMemory)
+            let! flushResult = pipeWriter.WriteAsync(bufferWriter.WrittenMemory)
+            if flushResult.IsCanceled then
+                raise (OperationCanceledException())
+            // TODO?: Handle flushResult.IsCompleted
             return ()
         }

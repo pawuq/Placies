@@ -97,12 +97,12 @@ type DagCborIpldCodec() =
     interface IIpldCodec with
         member this.CodecInfo = MultiCodecInfos.DagCbor
 
-        member this.TryDecodeAsync(stream) = taskResult {
-            let cbor = CBORObject.Read(stream)
+        member this.TryDecodeAsync(pipeReader) = taskResult {
+            let cbor = CBORObject.Read(pipeReader.AsStream())
             return! DagCbor.tryDecode cbor |> Result.mapError exn
         }
 
-        member this.TryEncodeAsync(writeToStream, dataModelNode) = taskResult {
+        member this.TryEncodeAsync(pipeWriter, dataModelNode) = taskResult {
             let! cbor = DagCbor.tryEncode dataModelNode |> Result.mapError exn
-            CBORObject.Write(cbor, writeToStream, CBOREncodeOptions("float64=true"))
+            CBORObject.Write(cbor, pipeWriter.AsStream(), CBOREncodeOptions("float64=true"))
         }

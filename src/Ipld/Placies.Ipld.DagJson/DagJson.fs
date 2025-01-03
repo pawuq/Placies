@@ -105,15 +105,15 @@ type DagJsonIpldCodec(multibaseProvider: IMultiBaseProvider) =
     interface IIpldCodec with
         member _.CodecInfo = MultiCodecInfos.DagJson
 
-        member this.TryEncodeAsync(pipeWriter, dataModelNode) = taskResult {
+        member this.TryEncodeAsync(pipeWriter, dataModelNode, ct) = taskResult {
             let! jsonNode = DagJson.tryEncode dataModelNode |> Result.mapError exn
             let jsonSerializerOptions = JsonSerializerOptions(
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             )
-            do! JsonSerializer.SerializeAsync(pipeWriter.AsStream(), jsonNode, jsonSerializerOptions)
+            do! JsonSerializer.SerializeAsync(pipeWriter.AsStream(), jsonNode, jsonSerializerOptions, ct)
         }
 
-        member this.TryDecodeAsync(pipeReader) = taskResult {
-            let! jsonNode = JsonSerializer.DeserializeAsync<JsonNode>(pipeReader.AsStream())
+        member this.TryDecodeAsync(pipeReader, ct) = taskResult {
+            let! jsonNode = JsonSerializer.DeserializeAsync<JsonNode>(pipeReader.AsStream(), cancellationToken=ct)
             return! DagJson.tryDecode multibaseProvider jsonNode |> Result.mapError exn
         }

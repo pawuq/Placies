@@ -89,8 +89,8 @@ module DagPb =
         }
     }
 
-type DagPbCodec() =
-    interface ICodec with
+type DagPbIpldCodec() =
+    interface IIpldCodec with
         member this.CodecInfo = MultiCodecInfos.DagPb
 
         member this.TryDecodeAsync(stream) = taskResult {

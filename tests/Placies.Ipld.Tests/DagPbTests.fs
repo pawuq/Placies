@@ -47,5 +47,5 @@ type DagPbTests(output: ITestOutputHelper) =
     [<SkippableTheory>]
     [<MemberData("GetDagPbFixtures")>]
     member _.``Test fixtures reencoding``(fixture: CodecFixture): unit =
-        let dagPbCodec = DagPbCodec()
-        IpldFixtures.testReencoding output DagPbTests.FixturesToSkip dagPbCodec fixture
+        let dagPbIpldCodec = DagPbIpldCodec()
+        IpldFixtures.testReencoding output DagPbTests.FixturesToSkip dagPbIpldCodec fixture

@@ -101,8 +101,8 @@ module DagJson =
         | _ ->
             Error $"Invalid JsonNode: %A{jsonNode}"
 
-type DagJsonCodec(multibaseProvider: IMultiBaseProvider) =
-    interface ICodec with
+type DagJsonIpldCodec(multibaseProvider: IMultiBaseProvider) =
+    interface IIpldCodec with
         member _.CodecInfo = MultiCodecInfos.DagJson
 
         member this.TryEncodeAsync(writeToStream, dataModelNode) = taskResult {

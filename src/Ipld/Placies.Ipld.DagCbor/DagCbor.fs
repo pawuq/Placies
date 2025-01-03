@@ -93,8 +93,8 @@ module DagCbor =
     }
 
 
-type DagCborCodec() =
-    interface ICodec with
+type DagCborIpldCodec() =
+    interface IIpldCodec with
         member this.CodecInfo = MultiCodecInfos.DagCbor
 
         member this.TryDecodeAsync(stream) = taskResult {

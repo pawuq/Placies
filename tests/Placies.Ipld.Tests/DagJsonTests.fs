@@ -27,5 +27,5 @@ type DagJsonTests(output: ITestOutputHelper) =
     [<SkippableTheory>]
     [<MemberData("GetDagJsonFixtures")>]
     member _.``Test fixtures reencoding``(fixture: CodecFixture): unit =
-        let dagJsonCodec = DagJsonCodec(MultiBaseRegistry.CreateDefault())
-        IpldFixtures.testReencoding output DagJsonTests.FixturesToSkip dagJsonCodec fixture
+        let dagJsonIpldCodec = DagJsonIpldCodec(MultiBaseRegistry.CreateDefault())
+        IpldFixtures.testReencoding output DagJsonTests.FixturesToSkip dagJsonIpldCodec fixture

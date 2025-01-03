@@ -62,7 +62,7 @@ module IpldFixtures =
                     }
     }
 
-    let testReencoding (output: ITestOutputHelper) (fixturesToSkip: IReadOnlyDictionary<string, string>) (codec: ICodec) (fixture: CodecFixture) : unit =
+    let testReencoding (output: ITestOutputHelper) (fixturesToSkip: IReadOnlyDictionary<string, string>) (codec: IIpldCodec) (fixture: CodecFixture) : unit =
         output.WriteLine($"Fixture '%s{fixture.Name}'")
         ( let condition, reason = fixturesToSkip.TryGetValue(fixture.Name)
           Skip.If(condition, reason) )

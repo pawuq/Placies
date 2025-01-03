@@ -5,14 +5,14 @@ open FsToolkit.ErrorHandling
 open Placies
 open Placies.Multiformats
 
-type ICodec =
+type IIpldCodec =
     abstract CodecInfo: MultiCodecInfo
     abstract TryEncodeAsync: writeToStream: Stream * dataModelNode: DataModelNode -> TaskResult<unit, exn>
     abstract TryDecodeAsync: stream: Stream -> TaskResult<DataModelNode, exn>
 
 [<AutoOpen>]
 module CodecExtensions =
-    type ICodec with
+    type IIpldCodec with
         member this.TryEncodeWithCidAsync(writeToStream: Stream, dataModelNode: DataModelNode, cidVersion: int, cidMultihashInfo: MultiHashInfo): TaskResult<Cid, exn> = taskResult {
             use stream = new MemoryStream()
             do! this.TryEncodeAsync(stream, dataModelNode)

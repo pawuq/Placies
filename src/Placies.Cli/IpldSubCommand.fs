@@ -47,10 +47,10 @@ type IpldArgs =
 [<RequireQualifiedAccess>]
 module IpldArgs =
 
-    let getCodecByInfo multiBaseProvider (codecInfo: MultiCodecInfo) : ICodec option =
+    let getIpldCodecByInfo multiBaseProvider (codecInfo: MultiCodecInfo) : IIpldCodec option =
         match codecInfo with
-        | Equals MultiCodecInfos.DagJson -> DagJsonCodec(multiBaseProvider) :> ICodec |> Some
-        | Equals MultiCodecInfos.DagCbor -> DagCborCodec() :> ICodec |> Some
+        | Equals MultiCodecInfos.DagJson -> DagJsonIpldCodec(multiBaseProvider) :> IIpldCodec |> Some
+        | Equals MultiCodecInfos.DagCbor -> DagCborIpldCodec() :> IIpldCodec |> Some
         | _ -> None
 
     let handle
@@ -69,8 +69,8 @@ module IpldArgs =
                 let! inputCodecInfo = multiCodecProvider.TryGetByName(inputCodecArg) |> Result.requireSome $"Unknown input codec: %s{inputCodecArg}"
                 let! outputCodecInfo = multiCodecProvider.TryGetByName(outputCodecArg) |> Result.requireSome $"Unknown output codec: %s{outputCodecArg}"
 
-                let! inputCodec = inputCodecInfo |> getCodecByInfo multiBaseProvider |> Result.requireSome $"Unknown input codec info: %A{inputCodecInfo}"
-                let! outputCodec = outputCodecInfo |> getCodecByInfo multiBaseProvider |> Result.requireSome $"Unknown output codec info: %A{outputCodecInfo}"
+                let! inputCodec = inputCodecInfo |> getIpldCodecByInfo multiBaseProvider |> Result.requireSome $"Unknown input codec info: %A{inputCodecInfo}"
+                let! outputCodec = outputCodecInfo |> getIpldCodecByInfo multiBaseProvider |> Result.requireSome $"Unknown output codec info: %A{outputCodecInfo}"
 
                 use inputStream =
                     if inputArg = "-" then

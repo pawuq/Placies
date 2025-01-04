@@ -1,8 +1,10 @@
 namespace Placies.Multiformats
 
 open System
+open System.Collections.Generic
 open FsToolkit.ErrorHandling
 open Placies.Utils
+open Placies.Utils.Collections
 
 
 type IBaseCoder =
@@ -43,3 +45,18 @@ module MultiBase =
 
     let decode provider multibaseText =
         tryDecode provider multibaseText |> Result.getOk
+
+type MultiBaseRegistry() =
+    let registryByPrefix = Dictionary<char, MultiBaseInfo>()
+    let registryByName = Dictionary<string, MultiBaseInfo>()
+
+    member _.Register(info: MultiBaseInfo): bool =
+        Dictionary.tryAdd2
+            registryByName info.Name info
+            registryByPrefix info.PrefixCharacter info
+
+    interface IMultiBaseProvider with
+        member this.TryGetByName(name) =
+            registryByName.TryGetValue(name) |> Option.ofTryByref
+        member this.TryGetByPrefix(prefix) =
+            registryByPrefix.TryGetValue(prefix) |> Option.ofTryByref

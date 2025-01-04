@@ -1,9 +1,7 @@
 namespace Placies.Multiformats
 
 open System
-open System.Collections.Generic
 open System.Security.Cryptography
-open Placies.Utils
 
 
 type IdentityHashAlgorithm() =
@@ -25,22 +23,20 @@ module MultiHashInfos =
     let Sha2_256 = { CodecInfo = MultiCodecInfos.Sha2_256; HashAlgorithm = fun () -> SHA256.Create() }
 
 
-type MultiHashRegistry() =
-    let registryOfName = Dictionary<string, MultiHashInfo>()
-    let registryOfCode = Dictionary<int, MultiHashInfo>()
+[<AutoOpen>]
+module DefaultMultiHashRegistryExtensions =
+    type MultiHashRegistry with
 
-    member this.Register(info: MultiHashInfo): bool =
-        registryOfCode.TryAdd(info.Code, info)
-        && registryOfName.TryAdd(info.Name, info)
+        static member DefaultMultiHashInfos = seq {
+            MultiHashInfos.Identity
+            MultiHashInfos.Sha2_256
+        }
 
-    interface IMultiHashProvider with
-        member this.TryGetByCode(code) =
-            registryOfCode.TryGetValue(code) |> Option.ofTryByref
-        member this.TryGetByName(name) =
-            registryOfName.TryGetValue(name) |> Option.ofTryByref
+        member this.RegisterDefaults(): unit =
+            for multiHashInfo in MultiHashRegistry.DefaultMultiHashInfos do
+                this.Register(multiHashInfo) |> ignore
 
-    static member CreateDefault(): MultiHashRegistry =
-        let registry = MultiHashRegistry()
-        registry.Register(MultiHashInfos.Identity) |> ignore
-        registry.Register(MultiHashInfos.Sha2_256) |> ignore
-        registry
+        static member CreateDefault(): MultiHashRegistry =
+            let registry = MultiHashRegistry()
+            registry.RegisterDefaults()
+            registry

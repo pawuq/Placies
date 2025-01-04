@@ -1,11 +1,13 @@
 namespace Placies.Multiformats
 
 open System
+open System.Collections.Generic
 open System.IO
 open System.Security.Cryptography
 open System.Text
 open Placies
 open Placies.Utils
+open Placies.Utils.Collections
 
 
 type MultiHashInfo = {
@@ -120,3 +122,19 @@ module MultiHash =
     let computeFromStream (stream: Stream) (info: MultiHashInfo) : MultiHash =
         let digest = info.HashAlgorithm().ComputeHash(stream)
         create info.Code digest
+
+
+type MultiHashRegistry() =
+    let registryOfName = Dictionary<string, MultiHashInfo>()
+    let registryOfCode = Dictionary<int, MultiHashInfo>()
+
+    member _.Register(info: MultiHashInfo): bool =
+        Dictionary.tryAdd2
+            registryOfCode info.Code info
+            registryOfName info.Name info
+
+    interface IMultiHashProvider with
+        member _.TryGetByCode(code) =
+            registryOfCode.TryGetValue(code) |> Option.ofTryByref
+        member _.TryGetByName(name) =
+            registryOfName.TryGetValue(name) |> Option.ofTryByref

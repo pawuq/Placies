@@ -93,3 +93,9 @@ module DefaultMultiBaseRegistryExtensions =
             let registry = MultiBaseRegistry()
             registry.RegisterDefaults()
             registry
+
+[<AutoOpen>]
+module SharedMultiBaseRegistryExtensions =
+    let private sharedInstance = MultiBaseRegistry.CreateDefault()
+    type MultiBaseRegistry with
+        static member Shared = sharedInstance

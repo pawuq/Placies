@@ -40,3 +40,9 @@ module DefaultMultiHashRegistryExtensions =
             let registry = MultiHashRegistry()
             registry.RegisterDefaults()
             registry
+
+[<AutoOpen>]
+module SharedMultiHashRegistryExtensions =
+    let private sharedInstance = MultiHashRegistry.CreateDefault()
+    type MultiHashRegistry with
+        static member Shared = sharedInstance

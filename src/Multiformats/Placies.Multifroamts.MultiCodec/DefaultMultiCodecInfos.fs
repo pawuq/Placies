@@ -57,3 +57,9 @@ module DefaultMultiCodecRegistryExtensions =
             let registry = MultiCodecRegistry()
             registry.RegisterDefaults()
             registry
+
+[<AutoOpen>]
+module SharedMultiCodecRegistryExtensions =
+    let private sharedInstance = MultiCodecRegistry.CreateDefault()
+    type MultiCodecRegistry with
+        static member Shared = sharedInstance

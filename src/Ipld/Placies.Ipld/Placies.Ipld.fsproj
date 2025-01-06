@@ -9,6 +9,7 @@
       <Compile Include="DataModel.fs" />
       <Compile Include="DataModelBuilders.fs" />
       <Compile Include="IpldCodec.fs" />
+      <Compile Include="IpldCodecProvider.fs" />
       <Compile Include="RawIpldCodec.fs" />
     </ItemGroup>
 

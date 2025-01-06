@@ -71,27 +71,31 @@ module MultiBaseInfos =
     }
 
 
-type MultiBaseRegistry() =
-    let registryByPrefix = Dictionary<char, MultiBaseInfo>()
-    let registryByName = Dictionary<string, MultiBaseInfo>()
+[<AutoOpen>]
+module DefaultMultiBaseRegistryExtensions =
+    type MultiBaseRegistry with
 
-    member _.Register(info: MultiBaseInfo): bool =
-        registryByName.TryAdd(info.Name, info)
-        && registryByPrefix.TryAdd(info.PrefixCharacter, info)
+        static member DefaultMultiBaseInfos = seq {
+            MultiBaseInfos.Base10
+            MultiBaseInfos.Base16
+            MultiBaseInfos.Base32
+            MultiBaseInfos.Base36
+            MultiBaseInfos.Base58Btc
+            MultiBaseInfos.Base64
+            MultiBaseInfos.Base64Url
+        }
 
-    interface IMultiBaseProvider with
-        member this.TryGetByName(name) =
-            registryByName.TryGetValue(name) |> Option.ofTryByref
-        member this.TryGetByPrefix(prefix) =
-            registryByPrefix.TryGetValue(prefix) |> Option.ofTryByref
+        member this.RegisterDefaults(): unit =
+            for multiBaseInfo in MultiBaseRegistry.DefaultMultiBaseInfos do
+                this.Register(multiBaseInfo) |> ignore
 
-    static member CreateDefault(): MultiBaseRegistry =
-        let registry = MultiBaseRegistry()
-        registry.Register(MultiBaseInfos.Base10) |> ignore
-        registry.Register(MultiBaseInfos.Base16) |> ignore
-        registry.Register(MultiBaseInfos.Base32) |> ignore
-        registry.Register(MultiBaseInfos.Base36) |> ignore
-        registry.Register(MultiBaseInfos.Base58Btc) |> ignore
-        registry.Register(MultiBaseInfos.Base64) |> ignore
-        registry.Register(MultiBaseInfos.Base64Url) |> ignore
-        registry
+        static member CreateDefault(): MultiBaseRegistry =
+            let registry = MultiBaseRegistry()
+            registry.RegisterDefaults()
+            registry
+
+[<AutoOpen>]
+module SharedMultiBaseRegistryExtensions =
+    let private sharedInstance = MultiBaseRegistry.CreateDefault()
+    type MultiBaseRegistry with
+        static member Shared = sharedInstance

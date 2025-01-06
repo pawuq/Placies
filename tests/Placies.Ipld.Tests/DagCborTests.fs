@@ -22,5 +22,5 @@ type DagCborTests(output: ITestOutputHelper) =
     [<SkippableTheory>]
     [<MemberData("GetDagCborFixtures")>]
     member _.``Test fixtures reencoding``(fixture: CodecFixture): unit =
-        let dagCborCodec = DagCborCodec()
-        IpldFixtures.testReencoding output DagCborTests.FixturesToSkip dagCborCodec fixture
+        let dagCborIpldCodec = DagCborIpldCodec()
+        IpldFixtures.testReencoding output DagCborTests.FixturesToSkip dagCborIpldCodec fixture

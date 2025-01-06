@@ -1,6 +1,7 @@
 namespace Placies.Utils.Collections
 
 open System
+open System.Collections.Generic
 
 
 [<RequireQualifiedAccess>]
@@ -25,3 +26,20 @@ module Array =
 
     let exactlyTwo (source: 'a array) : 'a * 'a =
         tryExactlyTwo source |> Option.get
+
+
+[<RequireQualifiedAccess>]
+module Dictionary =
+
+    let tryAdd2
+            (source1: IDictionary<'K1, 'V1>) (k1: 'K1) (v1: 'V1)
+            (source2: IDictionary<'K2, 'V2>) (k2: 'K2) (v2: 'V2)
+            : bool =
+        if source1.TryAdd(k1, v1) then
+            if source2.TryAdd(k2, v2) then
+                true
+            else
+                source1.Remove(k1) |> ignore
+                false
+        else
+            false

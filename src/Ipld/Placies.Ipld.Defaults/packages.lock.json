@@ -8,16 +8,6 @@
         "resolved": "8.0.401",
         "contentHash": "pvmquLrs82m8WqWB49Gj+hsmnWURkUbc++pJ0P2NdrEv1ZVVrhDNjSiFNP4wW4HiTowwaRhjiBc5IKNV35Vf/A=="
       },
-      "PeterO.Cbor": {
-        "type": "Direct",
-        "requested": "[4.5.5, )",
-        "resolved": "4.5.5",
-        "contentHash": "9fMcLg2SUm9ri1j3gVPYxk6+Ev4l4wu93bYwFG1tvntg1Qy4m0rFDdxStG88XR/W4DggOtBXfPVkC3bLF10nqw==",
-        "dependencies": {
-          "PeterO.Numbers": "1.8.2",
-          "PeterO.URIUtility": "1.0.0"
-        }
-      },
       "PeterO.Numbers": {
         "type": "Transitive",
         "resolved": "1.8.2",
@@ -49,6 +39,29 @@
           "Placies.Multiformats.MultiBase": "[1.0.0, )",
           "Placies.Multifroamts.MultiCodec": "[1.0.0, )",
           "System.IO.Pipelines": "[8.0.0, )"
+        }
+      },
+      "placies.ipld.dagcbor": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "[8.0.401, )",
+          "PeterO.Cbor": "[4.5.5, )",
+          "Placies.Ipld": "[1.0.0, )"
+        }
+      },
+      "placies.ipld.dagjson": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "[8.0.401, )",
+          "Newtonsoft.Json": "[13.0.3, )",
+          "Placies.Ipld": "[1.0.0, )"
+        }
+      },
+      "placies.ipld.dagpb": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "[8.0.401, )",
+          "Placies.Ipld": "[1.0.0, )"
         }
       },
       "placies.multiformats.multibase": {
@@ -107,6 +120,22 @@
         "contentHash": "0468/s/OxckJ2RfZBzwAWQzksztA0FlRmHHauBHJ1pYBpHvXevKMowWeJQRfqZp+24whM9DaNzP8fWDScQ8aPA==",
         "dependencies": {
           "FsToolkit.ErrorHandling": "4.17.0"
+        }
+      },
+      "Newtonsoft.Json": {
+        "type": "CentralTransitive",
+        "requested": "[13.0.3, )",
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+      },
+      "PeterO.Cbor": {
+        "type": "CentralTransitive",
+        "requested": "[4.5.5, )",
+        "resolved": "4.5.5",
+        "contentHash": "9fMcLg2SUm9ri1j3gVPYxk6+Ev4l4wu93bYwFG1tvntg1Qy4m0rFDdxStG88XR/W4DggOtBXfPVkC3bLF10nqw==",
+        "dependencies": {
+          "PeterO.Numbers": "1.8.2",
+          "PeterO.URIUtility": "1.0.0"
         }
       },
       "SimpleBase": {

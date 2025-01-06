@@ -101,19 +101,19 @@ module DagJson =
         | _ ->
             Error $"Invalid JsonNode: %A{jsonNode}"
 
-type DagJsonCodec(multibaseProvider: IMultiBaseProvider) =
-    interface ICodec with
+type DagJsonIpldCodec(multibaseProvider: IMultiBaseProvider) =
+    interface IIpldCodec with
         member _.CodecInfo = MultiCodecInfos.DagJson
 
-        member this.TryEncodeAsync(writeToStream, dataModelNode) = taskResult {
+        member this.TryEncodeAsync(pipeWriter, dataModelNode, ct) = taskResult {
             let! jsonNode = DagJson.tryEncode dataModelNode |> Result.mapError exn
             let jsonSerializerOptions = JsonSerializerOptions(
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             )
-            do! JsonSerializer.SerializeAsync(writeToStream, jsonNode, jsonSerializerOptions)
+            do! JsonSerializer.SerializeAsync(pipeWriter.AsStream(), jsonNode, jsonSerializerOptions, ct)
         }
 
-        member this.TryDecodeAsync(stream) = taskResult {
-            let! jsonNode = JsonSerializer.DeserializeAsync<JsonNode>(stream)
+        member this.TryDecodeAsync(pipeReader, ct) = taskResult {
+            let! jsonNode = JsonSerializer.DeserializeAsync<JsonNode>(pipeReader.AsStream(), cancellationToken=ct)
             return! DagJson.tryDecode multibaseProvider jsonNode |> Result.mapError exn
         }

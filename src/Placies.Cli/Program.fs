@@ -3,6 +3,7 @@
 open System
 open FsToolkit.ErrorHandling
 open Argu
+open Placies.Ipld
 open Placies.Utils
 open Placies.Multiformats
 open Placies.Cli.MultiformatsSubCommand
@@ -26,6 +27,7 @@ module Program =
         let multiBaseProvider: IMultiBaseProvider = MultiBaseRegistry.CreateDefault()
         let multiCodecProvider: IMultiCodecProvider = MultiCodecRegistry.CreateDefault()
         let multiHashProvider: IMultiHashProvider = MultiHashRegistry.CreateDefault()
+        let ipldCodecProvider: IIpldCodecProvider = IpldCodecRegistry.CreateDefault(multiBaseProvider)
 
         let argumentParser =
             let errorHandler = ProcessExiter(function ErrorCode.HelpText -> None | _ -> Some ConsoleColor.DarkRed)
@@ -34,7 +36,7 @@ module Program =
         taskResult {
             match argsParseResults.GetSubCommand() with
             | Args.Ipld ipldArgsParseResults ->
-                do! ipldArgsParseResults |> IpldArgs.handle multiBaseProvider multiCodecProvider multiHashProvider
+                do! ipldArgsParseResults |> IpldArgs.handle multiBaseProvider multiCodecProvider multiHashProvider ipldCodecProvider
             | Args.Multiformats multiformatsArgsParseResults ->
                 do! multiformatsArgsParseResults |> MultiformatsArgs.handle multiBaseProvider
         } |> Task.runSynchronously |> Result.getOk

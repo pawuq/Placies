@@ -8,13 +8,19 @@
     <ItemGroup>
       <Compile Include="DataModel.fs" />
       <Compile Include="DataModelBuilders.fs" />
-      <Compile Include="Codec.fs" />
+      <Compile Include="IpldCodec.fs" />
+      <Compile Include="IpldCodecProvider.fs" />
+      <Compile Include="RawIpldCodec.fs" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\Multiformats\Placies.Multiformats.MultiBase\Placies.Multiformats.MultiBase.fsproj" />
         <ProjectReference Include="..\..\Multiformats\Placies.Multifroamts.MultiCodec\Placies.Multifroamts.MultiCodec.fsproj" />
         <ProjectReference Include="..\..\Multiformats\Placies.Cid\Placies.Cid.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.IO.Pipelines" />
     </ItemGroup>
 
 </Project>

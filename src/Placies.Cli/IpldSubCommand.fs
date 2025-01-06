@@ -7,8 +7,6 @@ open Argu
 open Placies
 open Placies.Utils
 open Placies.Ipld
-open Placies.Ipld.DagCbor
-open Placies.Ipld.DagJson
 open Placies.Multiformats
 
 [<RequireQualifiedAccess>]
@@ -47,14 +45,8 @@ type IpldArgs =
 [<RequireQualifiedAccess>]
 module IpldArgs =
 
-    let getCodecByInfo multiBaseProvider (codecInfo: MultiCodecInfo) : ICodec option =
-        match codecInfo with
-        | Equals MultiCodecInfos.DagJson -> DagJsonCodec(multiBaseProvider) :> ICodec |> Some
-        | Equals MultiCodecInfos.DagCbor -> DagCborCodec() :> ICodec |> Some
-        | _ -> None
-
     let handle
-            (multiBaseProvider: IMultiBaseProvider) (multiCodecProvider: IMultiCodecProvider) (multiHashProvider: IMultiHashProvider)
+            (multiBaseProvider: IMultiBaseProvider) (multiCodecProvider: IMultiCodecProvider) (multiHashProvider: IMultiHashProvider) (ipldCodecProvider: IIpldCodecProvider)
             (ipldArgsParseResults: ParseResults<IpldArgs>)
             =
         taskResult {
@@ -69,8 +61,8 @@ module IpldArgs =
                 let! inputCodecInfo = multiCodecProvider.TryGetByName(inputCodecArg) |> Result.requireSome $"Unknown input codec: %s{inputCodecArg}"
                 let! outputCodecInfo = multiCodecProvider.TryGetByName(outputCodecArg) |> Result.requireSome $"Unknown output codec: %s{outputCodecArg}"
 
-                let! inputCodec = inputCodecInfo |> getCodecByInfo multiBaseProvider |> Result.requireSome $"Unknown input codec info: %A{inputCodecInfo}"
-                let! outputCodec = outputCodecInfo |> getCodecByInfo multiBaseProvider |> Result.requireSome $"Unknown output codec info: %A{outputCodecInfo}"
+                let! inputCodec = ipldCodecProvider.TryGetByMultiCodecInfo(inputCodecInfo) |> Result.requireSome $"Unknown input codec info: %A{inputCodecInfo}"
+                let! outputCodec = ipldCodecProvider.TryGetByMultiCodecInfo(outputCodecInfo) |> Result.requireSome $"Unknown output codec info: %A{outputCodecInfo}"
 
                 use inputStream =
                     if inputArg = "-" then

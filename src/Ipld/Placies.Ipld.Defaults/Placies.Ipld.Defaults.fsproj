@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="DefaultIpldCodecProvider.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Placies.Ipld.DagCbor\Placies.Ipld.DagCbor.fsproj" />
+        <ProjectReference Include="..\Placies.Ipld.DagJson\Placies.Ipld.DagJson.fsproj" />
+        <ProjectReference Include="..\Placies.Ipld.DagPb\Placies.Ipld.DagPb.fsproj" />
+    </ItemGroup>
+
+</Project>

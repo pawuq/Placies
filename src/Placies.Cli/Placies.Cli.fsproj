@@ -16,8 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Ipld\Placies.Ipld.DagCbor\Placies.Ipld.DagCbor.fsproj" />
-      <ProjectReference Include="..\Ipld\Placies.Ipld.DagJson\Placies.Ipld.DagJson.fsproj" />
+      <ProjectReference Include="..\Ipld\Placies.Ipld.Defaults\Placies.Ipld.Defaults.fsproj" />
       <ProjectReference Include="..\Ipld\Placies.Ipld\Placies.Ipld.fsproj" />
     </ItemGroup>
 

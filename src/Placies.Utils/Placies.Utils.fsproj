@@ -13,6 +13,7 @@
         <Compile Include="Collections.fs" />
         <Compile Include="AddableBuilder.fs" />
         <Compile Include="Task.fs" />
+        <Compile Include="ComparableReadOnlyMemory.fs" />
     </ItemGroup>
 
     <ItemGroup>

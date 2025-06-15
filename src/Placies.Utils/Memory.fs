@@ -1,6 +1,7 @@
 namespace Placies.Utils
 
 open System
+open System.Runtime.CompilerServices
 
 [<AutoOpen>]
 module ReadOnlyMemoryExtensions =
@@ -13,6 +14,11 @@ module ReadOnlySpanExtensions =
     type Span<'T> with
         member this.AsReadOnly(): ReadOnlySpan<'T> =
             Span.op_Implicit(this)
+
+type ArrayExtensions private () =
+    [<Extension>]
+    static member AsReadOnlyMemory(this: 'T array): ReadOnlyMemory<'T> =
+        this.AsMemory().AsReadOnly()
 
 [<RequireQualifiedAccess>]
 module Array =

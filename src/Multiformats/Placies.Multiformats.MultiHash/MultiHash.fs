@@ -23,8 +23,9 @@ type IMultiHashProvider =
 
 type MultiHash = {
     HashFunctionCode: int
-    Digest: byte array // TODO: Change to ReadOnlyMemory
+    ComparableDigest: ComparableReadOnlyMemory<byte>
 } with
+    member this.Digest: ReadOnlyMemory<byte> = this.ComparableDigest.Value
     member this.DigestSize: int = this.Digest.Length
 
 type MultiHashParser =
@@ -49,7 +50,7 @@ type MultiHashParser =
                     bytesConsumed <- bytesConsumed + digestSize
                     Ok {
                         HashFunctionCode = hashFuncCode
-                        Digest = digest
+                        ComparableDigest = ComparableReadOnlyMemory.Create(digest.AsReadOnlyMemory())
                     }
             | Error err, _ ->
                 Error (AggregateException("Failed parse digest size", err))
@@ -59,15 +60,15 @@ type MultiHashParser =
 [<RequireQualifiedAccess>]
 module MultiHash =
 
-    let create (hashFunctionCode: int) (digest: byte array) : MultiHash =
-        { HashFunctionCode = hashFunctionCode; Digest = digest }
+    let create (hashFunctionCode: int) (digest: ReadOnlyMemory<byte>) : MultiHash =
+        { HashFunctionCode = hashFunctionCode; ComparableDigest = ComparableReadOnlyMemory.Create(digest) }
 
     let ofStream (stream: Stream) : MultiHash =
         let hashFuncCode = stream.ReadVarIntAsInt32()
         let digestSize = stream.ReadVarIntAsInt32()
         let digest = Array.zeroCreate digestSize
         stream.Read(digest.AsSpan()) |> ignore
-        create hashFuncCode digest
+        create hashFuncCode (digest.AsReadOnlyMemory())
 
     let ofBytes (bytes: byte array) : MultiHash =
         use stream = new MemoryStream(bytes)
@@ -87,14 +88,14 @@ module MultiHash =
         let buffer = buffer.Slice(written1)
         let written2 = VarInt.writeToSpanOfInt32 multiHash.DigestSize buffer
         let buffer = buffer.Slice(written2)
-        multiHash.Digest.CopyTo(buffer)
+        multiHash.Digest.Span.CopyTo(buffer)
         let written3 = multiHash.Digest.Length
         written1 + written2 + written3
 
     let writeToStream (stream: Stream) (multiHash: MultiHash) : unit =
         stream.WriteVarInt(multiHash.HashFunctionCode)
         stream.WriteVarInt(multiHash.DigestSize)
-        stream.Write(multiHash.Digest)
+        stream.Write(multiHash.Digest.Span)
 
     let toBase58String (multiHash: MultiHash) : string =
         use stream = new MemoryStream()
@@ -110,18 +111,21 @@ module MultiHash =
         let multiHashInfo = multiHashProvider.TryGetByCode(multiHash.HashFunctionCode) |> Option.get // TODO: Error handling
         sb.Append(multiHashInfo.Name).Append(" : ") |> ignore
         sb.Append(multiHash.DigestSize * 8).Append(" : ") |> ignore
-        sb.Append(multiHash.Digest.ToHexString()) |> ignore
+        sb.Append(Convert.ToHexString(multiHash.Digest.Span)) |> ignore
         sb.ToString()
 
     // ----
 
-    let computeFromBytes (bytes: byte array) (info: MultiHashInfo) : MultiHash =
-        let digest = info.HashAlgorithm().ComputeHash(bytes)
-        create info.Code digest
+    let computeFromBytes (bytes: ReadOnlySpan<byte>) (info: MultiHashInfo) : MultiHash =
+        let hashAlgorithm = info.HashAlgorithm()
+        let digest = Array.zeroCreate (hashAlgorithm.HashSize / 8)
+        let success, _ = info.HashAlgorithm().TryComputeHash(bytes, digest.AsSpan())
+        assert success
+        create info.Code (digest.AsReadOnlyMemory())
 
     let computeFromStream (stream: Stream) (info: MultiHashInfo) : MultiHash =
         let digest = info.HashAlgorithm().ComputeHash(stream)
-        create info.Code digest
+        create info.Code (digest.AsReadOnlyMemory())
 
 
 type MultiHashRegistry() =

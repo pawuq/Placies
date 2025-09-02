@@ -1,6 +1,7 @@
 namespace Placies.Multiformats
 
 open System
+open System.Buffers
 open System.Collections.Generic
 open System.IO
 open System.Security.Cryptography
@@ -33,11 +34,13 @@ type MultiHashParser =
         bytesConsumed <- 0
         let mutable buffer = buffer
         match VarIntParser.TryParseFromSpanAsUInt64(buffer) with
+        | Error err, _ -> Error (AggregateException("Failed parse hash function code", err))
         | Ok hashFuncCode, consumed ->
             let hashFuncCode = int32<uint64> hashFuncCode
             bytesConsumed <- bytesConsumed + consumed
             buffer <- buffer.Slice(consumed)
             match VarIntParser.TryParseFromSpanAsUInt64(buffer) with
+            | Error err, _ -> Error (AggregateException("Failed parse digest size", err))
             | Ok digestSize, consumed ->
                 let digestSize = int32<uint64> digestSize
                 bytesConsumed <- bytesConsumed + consumed
@@ -52,10 +55,6 @@ type MultiHashParser =
                         HashFunctionCode = hashFuncCode
                         ComparableDigest = ComparableReadOnlyMemory.Create(digest.AsReadOnlyMemory())
                     }
-            | Error err, _ ->
-                Error (AggregateException("Failed parse digest size", err))
-        | Error err, _ ->
-            Error (AggregateException("Failed parse hash function code", err))
 
 [<RequireQualifiedAccess>]
 module MultiHash =
@@ -82,6 +81,26 @@ module MultiHash =
         VarInt.getSizeOfInt32 multiHash.HashFunctionCode
         + VarInt.getSizeOfInt32 multiHash.DigestSize
         + multiHash.DigestSize
+
+    let parseFromSequenceReader (reader: SequenceReader<byte> byref) : Result<MultiHash, exn> =
+        match VarInt.parseFromSequenceReaderAsUInt64 &reader with
+        | Error err -> Error (AggregateException("Failed parse hash function code", err))
+        | Ok hashFuncCode ->
+            let hashFuncCode = int<uint64> hashFuncCode
+            match VarInt.parseFromSequenceReaderAsUInt64 &reader with
+            | Error err -> Error (AggregateException("Failed parse digest size", err))
+            | Ok digestSize ->
+                let digestSize = int<uint64> digestSize
+                if digestSize > int reader.Remaining then
+                    Error (exn "Unexpected end of data")
+                else
+                    let digestBuffer = Array.zeroCreate<byte> digestSize
+                    reader.TryCopyTo(digestBuffer.AsSpan()) |> fun success -> assert success
+                    reader.Advance(digestSize)
+                    Ok {
+                        HashFunctionCode = hashFuncCode
+                        ComparableDigest = ComparableReadOnlyMemory.Create(digestBuffer)
+                    }
 
     let writeToSpan (multiHash: MultiHash) (buffer: Span<byte>) : int =
         let written1 = VarInt.writeToSpanOfInt32 multiHash.HashFunctionCode buffer

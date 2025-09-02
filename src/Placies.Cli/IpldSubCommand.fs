@@ -37,9 +37,11 @@ type IpldRecodeArgs =
 [<RequireQualifiedAccess>]
 type IpldArgs =
     | [<CliPrefix(CliPrefix.None); SubCommand>] Recode of ParseResults<IpldRecodeArgs>
+    | [<CliPrefix(CliPrefix.None); SubCommand>] Car of ParseResults<CarSubCommand.CarArgs>
     interface IArgParserTemplate with
         member this.Usage =
             match this with
+            | IpldArgs.Car _ -> "Commands for CAR"
             | IpldArgs.Recode _ -> "Convert IPLD data from a codec to another codec"
 
 [<RequireQualifiedAccess>]
@@ -51,6 +53,9 @@ module IpldArgs =
             =
         taskResult {
             match ipldArgsParseResults.GetSubCommand() with
+            | IpldArgs.Car carArgsParseResults ->
+                do! CarSubCommand.CarArgs.handle multiBaseProvider ipldCodecProvider carArgsParseResults
+
             | IpldArgs.Recode ipldRecodeArgsParseResults ->
                 let inputCodecArg = ipldRecodeArgsParseResults.GetResult(IpldRecodeArgs.Input_Codec)
                 let inputArg = ipldRecodeArgsParseResults.GetResult(IpldRecodeArgs.Input)

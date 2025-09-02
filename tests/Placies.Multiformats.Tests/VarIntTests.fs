@@ -5,6 +5,7 @@ open System.Buffers
 open Swensen.Unquote
 open Xunit
 open Placies
+open Placies.Utils
 
 let varints: (uint64 * byte array) seq = seq {
     1uL, [| 0x01uy |]
@@ -12,8 +13,11 @@ let varints: (uint64 * byte array) seq = seq {
     128uL, [| 0x80uy; 0x01uy |]
     255uL, [| 0xffuy; 0x01uy |]
     300uL, [| 0xacuy; 0x02uy |]
+    0x0400uL, [| 0x80uy; 0x08uy |]
+    0x0401uL, [| 0x81uy; 0x08uy |]
     16384uL, [| 0x80uy; 0x80uy; 0x01uy |]
     50000000uL, [| 128uy; 225uy; 235uy; 23uy |]
+    0x300000uL, [| 0x80uy; 0x80uy; 0xC0uy; 0x01uy |]
     4503599627370495uL, [| 255uy; 255uy; 255uy; 255uy; 255uy; 255uy; 255uy; 7uy |] // 2^52-1
     4503599627370496uL, [| 128uy; 128uy; 128uy; 128uy; 128uy; 128uy; 128uy; 8uy |] // 2^52
     9007199254740991uL, [| 255uy; 255uy; 255uy; 255uy; 255uy; 255uy; 255uy; 15uy |] // 2^53-1
@@ -29,13 +33,13 @@ type VarIntTests() =
         data
 
     [<Theory>]
-    [<MemberData("GetVarInts")>]
+    [<MemberData(nameof VarIntTests.GetVarInts)>]
     member _.``Bytes to int``(number: uint64, bytes: byte array): unit =
         let actualVarintNumber = VarInt.parseFromSpanAsUInt64Complete (ReadOnlySpan(bytes))
         test <@ Ok number = actualVarintNumber @>
 
     [<Theory>]
-    [<MemberData("GetVarInts")>]
+    [<MemberData(nameof VarIntTests.GetVarInts)>]
     member _.``Int to bytes``(number: uint64, bytes: byte array): unit =
         let bufferWriter = ArrayBufferWriter()
         VarInt.writeToBufferWriterOfUInt64 number bufferWriter
@@ -43,8 +47,28 @@ type VarIntTests() =
         test <@ bytes = actualVarintBytes @>
 
     [<Theory>]
-    [<MemberData("GetVarInts")>]
+    [<MemberData(nameof VarIntTests.GetVarInts)>]
     member _.``VarInt.getSize``(number: uint64, bytes: byte array): unit =
         let expectedSize = bytes.Length
         let actualSize = VarInt.getSizeOfUInt64 number
         test <@ actualSize = expectedSize @>
+
+    [<Theory>]
+    [<MemberData(nameof VarIntTests.GetVarInts)>]
+    member _.``VarInt.parseSizeOfSpan``(_number: uint64, bytes: byte array): unit =
+        let expectedSize = bytes.Length
+        let actualSize = VarInt.parseSizeOfSpan (bytes.AsSpan().AsReadOnly())
+        test <@ actualSize = Ok expectedSize @>
+
+    [<Theory>]
+    [<MemberData(nameof VarIntTests.GetVarInts)>]
+    member _.``VarInt.parseSizeOfSpan with leftovers``(_number: uint64, bytes: byte array): unit =
+        let expectedSize = bytes.Length
+
+        let bytes1 = [| yield! bytes; yield 0b1000_0000uy |]
+        let actualSize = VarInt.parseSizeOfSpan (bytes1.AsSpan().AsReadOnly())
+        test <@ actualSize = Ok expectedSize @>
+
+        let bytes2 = [| yield! bytes; yield 0b0000_0000uy |]
+        let actualSize = VarInt.parseSizeOfSpan (bytes2.AsSpan().AsReadOnly())
+        test <@ actualSize = Ok expectedSize @>

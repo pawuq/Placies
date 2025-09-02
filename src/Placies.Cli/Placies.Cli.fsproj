@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <Compile Include="MultiformatsSubCommand.fs" />
+        <Compile Include="CarSubCommand.fs" />
         <Compile Include="IpldSubCommand.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
@@ -16,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Ipld\Placies.Ipld.Car\Placies.Ipld.Car.fsproj" />
       <ProjectReference Include="..\Ipld\Placies.Ipld.Defaults\Placies.Ipld.Defaults.fsproj" />
       <ProjectReference Include="..\Ipld\Placies.Ipld\Placies.Ipld.fsproj" />
     </ItemGroup>

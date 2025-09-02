@@ -9,6 +9,7 @@
 
         <PackageVersion Include="FsToolkit.ErrorHandling" Version="4.17.0" />
         <PackageVersion Include="FsToolkit.ErrorHandling.TaskResult" Version="4.17.0" />
+        <PackageVersion Include="FSharp.Control.TaskSeq" Version="0.4.0" />
         <PackageVersion Include="FSharp.Control.Reactive" Version="5.0.5" />
 
         <PackageVersion Include="SimpleBase" Version="4.0.2" />
@@ -16,6 +17,7 @@
         <PackageVersion Include="PeterO.Cbor" Version="4.5.5" />
         <PackageVersion Include="Portable.BouncyCastle" Version="1.9.0" />
         <PackageVersion Include="System.IO.Pipelines" Version="8.0.0" />
+        <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.3.2" />
 
         <PackageVersion Include="Argu" Version="6.2.4" />
 

@@ -25,6 +25,7 @@
     <ItemGroup>
         <Compile Include="VarIntTests.fs" />
         <Compile Include="CidTests.fs" />
+        <Compile Include="MultiHashTests.fs" />
     </ItemGroup>
 
     <ItemGroup>

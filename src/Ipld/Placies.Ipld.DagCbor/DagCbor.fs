@@ -98,8 +98,11 @@ type DagCborIpldCodec() =
         member this.CodecInfo = MultiCodecInfos.DagCbor
 
         member this.TryDecodeAsync(pipeReader, _ct) = taskResult {
-            let cbor = CBORObject.Read(pipeReader.AsStream())
-            return! DagCbor.tryDecode cbor |> Result.mapError exn
+            try
+                let cbor = CBORObject.Read(pipeReader.AsStream())
+                return! DagCbor.tryDecode cbor |> Result.mapError exn
+            with ex ->
+                return! Error ex
         }
 
         member this.TryEncodeAsync(pipeWriter, dataModelNode, _ct) = taskResult {

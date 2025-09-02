@@ -8,6 +8,7 @@
     <ItemGroup>
       <Compile Include="DataModel.fs" />
       <Compile Include="DataModelBuilders.fs" />
+      <Compile Include="Pipelines.fs" />
       <Compile Include="IpldCodec.fs" />
       <Compile Include="IpldCodecProvider.fs" />
       <Compile Include="RawIpldCodec.fs" />

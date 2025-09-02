@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="CarV1.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.IO.Pipelines" />
+        <PackageReference Include="CommunityToolkit.HighPerformance" />
+        <PackageReference Include="FSharp.Control.TaskSeq" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Multiformats\Placies.Cid\Placies.Cid.fsproj" />
+        <ProjectReference Include="..\..\Multiformats\Placies.VarInt\Placies.VarInt.fsproj" />
+        <ProjectReference Include="..\..\Placies.Utils\Placies.Utils.fsproj" />
+        <ProjectReference Include="..\Placies.Ipld.DagCbor\Placies.Ipld.DagCbor.fsproj" />
+        <ProjectReference Include="..\Placies.Ipld\Placies.Ipld.fsproj" />
+    </ItemGroup>
+
+</Project>

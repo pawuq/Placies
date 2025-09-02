@@ -15,6 +15,7 @@
         <Compile Include="Collections.fs" />
         <Compile Include="AddableBuilder.fs" />
         <Compile Include="Task.fs" />
+        <Compile Include="Parsing.fs" />
         <Compile Include="Exn.fs" />
         <Compile Include="ComparableReadOnlyMemory.fs" />
     </ItemGroup>

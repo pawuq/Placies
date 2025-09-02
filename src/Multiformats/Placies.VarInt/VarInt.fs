@@ -7,6 +7,8 @@ open System.Runtime.InteropServices
 open System.Threading
 open System.Threading.Tasks
 open FsToolkit.ErrorHandling
+open Placies.Utils
+open Placies.Utils.Parsing
 
 
 type VarIntParser =
@@ -35,6 +37,8 @@ type VarIntParser =
 
 [<RequireQualifiedAccess>]
 module VarInt =
+
+    let maxSize: int = 9
 
     let private len8tab = [|
         0; 1; 2; 2; 3; 3; 3; 3; 4; 4; 4; 4; 4; 4; 4; 4;
@@ -79,6 +83,21 @@ module VarInt =
     let getSizeOfInt32 (x: int32) : int =
         getSizeOfUInt64 (uint64<int32> x)
 
+    let parseSizeOfSpan (buffer: ReadOnlySpan<byte>) : Result<int, ParseError<exn>> =
+        let mutable i = 0
+        let mutable res = ValueNone
+        while res.IsNone do
+            if i >= buffer.Length then
+                res <- Error ParseError.Incomplete |> ValueSome
+            else
+                if buffer.[i] >>> 7 = 0uy then
+                    res <- Ok (i + 1) |> ValueSome
+                else
+                    i <- i + 1
+                    if i >= (maxSize + 1) then
+                        res <- Error ^ ParseError.Error (InvalidDataException("Varint value is bigger than 9 bytes") :> exn) |> ValueSome
+        res.Value
+
     // ----
     // Read
 
@@ -110,6 +129,30 @@ module VarInt =
     let parseFromMemoryAsInt32 (buffer: ReadOnlyMemory<byte>) : Result<struct(ReadOnlyMemory<byte> * int32), exn> =
         parseFromMemoryAsUInt64 buffer |> Result.map (fun struct(buffer, value) -> struct(buffer, int32<uint64> value))
 
+    let private parseFromSequenceReaderMultisegmentAsUInt64 (reader: SequenceReader<byte> byref) : Result<uint64, exn> =
+        let buffer = Unsafe.stackallockSpan<byte> maxSize
+        if not (reader.TryCopyTo(buffer)) then
+            Error (InvalidDataException("Unexpected end of data") :> exn)
+        else
+            let res, bytesConsumed = VarIntParser.TryParseFromSpanAsUInt64(buffer)
+            match res with
+            | Error err -> Error err
+            | Ok value ->
+                reader.Advance(bytesConsumed)
+                Ok value
+
+    let parseFromSequenceReaderAsUInt64 (reader: SequenceReader<byte> byref) : Result<uint64, exn> =
+        let span = reader.UnreadSpan
+        if span.Length < maxSize then
+            parseFromSequenceReaderMultisegmentAsUInt64 &reader
+        else
+            let res, bytesConsumed = VarIntParser.TryParseFromSpanAsUInt64(span)
+            match res with
+            | Error err -> Error err
+            | Ok value ->
+                reader.Advance(bytesConsumed)
+                Ok value
+
     // TODO: Use System.Buffers and/or System.IO.Pipelines
     let readFromStreamAsUInt64Async (stream: Stream) (ct: CancellationToken) : Task<uint64> = task {
         let mutable value: uint64 = 0uL
@@ -120,7 +163,7 @@ module VarInt =
         while doLoop do
             do! stream.ReadExactlyAsync(buffer, 0, 1, ct)
             bytesRead <- bytesRead + 1
-            if bytesRead > 9 then
+            if bytesRead > maxSize then
                 raise (InvalidDataException("Varint value is bigger than 9 bytes"))
             let b = buffer.[0]
             value <- value ||| ((uint64 (b &&& 0x7Fuy)) <<< shift)
@@ -153,7 +196,7 @@ module VarInt =
         writeToSpanOfUInt64 (uint64<int32> value) buffer
 
     let writeToBufferWriterOfUInt64 (value: uint64) (bufferWriter: IBufferWriter<byte>) : unit =
-        let buffer = bufferWriter.GetSpan(10)
+        let buffer = bufferWriter.GetSpan(maxSize + 1)
         let written = writeToSpanOfUInt64 value buffer
         bufferWriter.Advance(written)
 
@@ -163,7 +206,7 @@ module VarInt =
     // TODO: Use System.Buffers and/or System.IO.Pipelines
     let writeToStreamOfUInt64Async (value: uint64) (stream: Stream) (ct: CancellationToken) : Task = task {
         let mutable value = value
-        let bytes: byte array = Array.zeroCreate 10
+        let bytes: byte array = Array.zeroCreate (maxSize + 1)
         let mutable i = 0
         let mutable doLoop = true
         while doLoop do

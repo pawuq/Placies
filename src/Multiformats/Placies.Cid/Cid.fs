@@ -3,6 +3,7 @@ namespace Placies
 #nowarn "0060" // FS0060 : Override implementations in augmentations are now deprecated. Override implementations should be given as part of the initial declaration of a type.
 
 open System
+open System.Buffers
 open System.IO
 open System.Text
 open FsToolkit.ErrorHandling
@@ -127,16 +128,19 @@ type CidParser =
         bytesConsumed <- 0
         let mutable buffer = buffer
         match VarIntParser.TryParseFromSpanAsUInt64(buffer) with
+        | Error err, _ -> Error (AggregateException("Failed parse version", err))
         | Ok version, consumed ->
-            let version = int32<uint64> version
+            let version = int<uint64> version
             bytesConsumed <- bytesConsumed + consumed
             buffer <- buffer.Slice(consumed)
             match VarIntParser.TryParseFromSpanAsUInt64(buffer) with
+            | Error err, _ -> Error (AggregateException("Failed parse content type code", err))
             | Ok contentTypeCode, consumed ->
-                let contentTypeCode = int32<uint64> contentTypeCode
+                let contentTypeCode = int<uint64> contentTypeCode
                 bytesConsumed <- bytesConsumed + consumed
                 buffer <- buffer.Slice(consumed)
                 match MultiHashParser.TryParseFromSpan(buffer) with
+                | Error err, _ -> Error (AggregateException("Failed parse multihash", err))
                 | Ok multiHash, consumed ->
                     buffer <- buffer.Slice(consumed)
                     bytesConsumed <- bytesConsumed + consumed
@@ -145,17 +149,12 @@ type CidParser =
                         ContentTypeCode = contentTypeCode
                         MultiHash = multiHash
                     }
-                | Error err, _ ->
-                    Error (AggregateException("Failed parse multihash", err))
-            | Error err, _ ->
-                Error (AggregateException("Failed parse content type code", err))
-        | Error err, _ ->
-            Error (AggregateException("Failed parse version", err))
 
     static member TryParseV0FromSpan(buffer: ReadOnlySpan<byte>, bytesConsumed: int outref): Result<Cid, exn> =
         let mutable buffer = buffer
         bytesConsumed <- 0
         match MultiHashParser.TryParseFromSpan(buffer) with
+        | Error err, _ -> Error (AggregateException("Failed parse multihash", err))
         | Ok multiHash, consumed ->
             buffer <- buffer.Slice(consumed)
             bytesConsumed <- bytesConsumed + consumed
@@ -164,8 +163,6 @@ type CidParser =
                 ContentTypeCode = MultiCodecInfos.DagPb.Code
                 MultiHash = multiHash
             }
-        | Error err, _ ->
-            Error (AggregateException("Failed parse multihash", err))
 
     static member TryParseFromSpan(buffer: ReadOnlySpan<byte>, bytesConsumed: int outref): Result<Cid, exn> =
         if buffer.Length < 2 then
@@ -175,3 +172,41 @@ type CidParser =
                 CidParser.TryParseV0FromSpan(buffer, &bytesConsumed)
             else
                 CidParser.TryParseV1FromSpan(buffer, &bytesConsumed)
+
+    static member TryParseV1FromSequenceReader(reader: SequenceReader<byte> byref): Result<Cid, exn> =
+        match VarInt.parseFromSequenceReaderAsUInt64 &reader with
+        | Error err -> Error (AggregateException("Failed parse version", err))
+        | Ok version ->
+            let version = int<uint64> version
+            match VarInt.parseFromSequenceReaderAsUInt64 &reader with
+            | Error err -> Error (AggregateException("Failed parse content type code", err))
+            | Ok contentTypeCode ->
+                let contentTypeCode = int<uint64> contentTypeCode
+                match MultiHash.parseFromSequenceReader &reader with
+                | Error err -> Error (AggregateException("Failed parse multihash", err))
+                | Ok multiHash ->
+                    Ok {
+                        Version = version
+                        ContentTypeCode = contentTypeCode
+                        MultiHash = multiHash
+                    }
+
+    static member TryParseV0FromSequenceReader(reader: SequenceReader<byte> byref): Result<Cid, exn> =
+        match MultiHash.parseFromSequenceReader &reader with
+        | Error err -> Error (AggregateException("Failed parse multihash", err))
+        | Ok multiHash ->
+            Ok {
+                Version = 0
+                ContentTypeCode = MultiCodecInfos.DagPb.Code
+                MultiHash = multiHash
+            }
+
+    static member TryParseFromSequenceReader(reader: SequenceReader<byte> byref): Result<Cid, exn> =
+        let sniffingBuffer = Unsafe.stackallockSpan<byte> 2
+        if not (reader.TryCopyTo(sniffingBuffer)) then
+            Error (exn "Cannot identify CID version: too few bytes")
+        else
+            if sniffingBuffer.[0] = 0x12uy && sniffingBuffer.[1] = 0x20uy then
+                CidParser.TryParseV0FromSequenceReader(&reader)
+            else
+                CidParser.TryParseV1FromSequenceReader(&reader)

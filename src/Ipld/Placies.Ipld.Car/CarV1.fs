@@ -91,12 +91,9 @@ module CarV1 =
         if readResult.Buffer.Length < headerSectionLength then
             return! Error ^ exn "Unexpected end of data"
         else
-            // TODO: Optimize
-            let headerBytes = Array.zeroCreate<byte> headerSectionLength
-            readResult.Buffer.Slice(0, headerSectionLength).CopyTo(headerBytes)
-            pipeReader.AdvanceTo(readResult.Buffer.GetPosition(headerSectionLength))
-            use headerStream = new MemoryStream(headerBytes)
-            let! headerDmn = dagCborIpldCodec.TryDecodeAsync(headerStream) |> TaskResult.mapError (fun err -> exn("Failed parse header data model", err))
+            let headerBytes = readResult.Buffer.Slice(0, headerSectionLength)
+            let! headerDmn = dagCborIpldCodec.TryDecode(headerBytes) |> Result.mapError (fun err -> exn("Failed parse header data model", err))
+            pipeReader.AdvanceTo(headerBytes.End)
             let! header = parseHeader headerDmn |> Result.mapError (fun errs -> exn($"Failed parse header:\n%A{errs}"))
             let headerLength = VarInt.getSizeOfInt32 headerSectionLength + headerSectionLength
             return header, headerLength
@@ -174,7 +171,7 @@ module CarV1 =
             |> Seq.map ^fun dataSection -> taskResult {
                 let cid = dataSection.Cid
                 let! ipldCodec = ipldCodecProvider.TryGetByCid(cid) |> Result.requireSome (exn $"Not found IPLD codec for cid %A{cid}")
-                let! content = ipldCodec.TryDecodeAsync(dataSection.BlockBytes)
+                let! content = ipldCodec.TryDecode(ReadOnlySequence(dataSection.BlockBytes))
                 return dataModelMap {
                     "cid", cid
                     "content", content

@@ -1,5 +1,7 @@
 namespace Placies.Ipld.DagCbor
 
+open System.IO.Pipelines
+open CommunityToolkit.HighPerformance
 open FsToolkit.ErrorHandling
 open PeterO.Cbor
 open Placies
@@ -97,15 +99,18 @@ type DagCborIpldCodec() =
     interface IIpldCodec with
         member this.CodecInfo = MultiCodecInfos.DagCbor
 
-        member this.TryDecodeAsync(pipeReader, _ct) = taskResult {
+        member this.TryDecode(buffer) = result {
             try
+                let pipeReader = PipeReader.Create(buffer)
                 let cbor = CBORObject.Read(pipeReader.AsStream())
+                pipeReader.Complete()
                 return! DagCbor.tryDecode cbor |> Result.mapError exn
             with ex ->
                 return! Error ex
         }
 
-        member this.TryEncodeAsync(pipeWriter, dataModelNode, _ct) = taskResult {
+        member this.TryEncode(bufferWriter, dataModelNode) = result {
             let! cbor = DagCbor.tryEncode dataModelNode |> Result.mapError exn
-            CBORObject.Write(cbor, pipeWriter.AsStream(), CBOREncodeOptions("float64=true"))
+            let stream = bufferWriter.AsStream()
+            cbor.WriteTo(stream, CBOREncodeOptions("float64=true"))
         }

@@ -44,6 +44,7 @@
       "placies.ipld.dagcbor": {
         "type": "Project",
         "dependencies": {
+          "CommunityToolkit.HighPerformance": "[8.3.2, )",
           "FSharp.Core": "[8.0.401, )",
           "PeterO.Cbor": "[4.5.5, )",
           "Placies.Ipld": "[1.0.0, )"
@@ -103,6 +104,12 @@
           "FSharp.Core": "[8.0.401, )",
           "Placies.Utils": "[1.0.0, )"
         }
+      },
+      "CommunityToolkit.HighPerformance": {
+        "type": "CentralTransitive",
+        "requested": "[8.3.2, )",
+        "resolved": "8.3.2",
+        "contentHash": "1Os81ua0FmIOtiSgOk5C1KBraQ3SDfxs/7BG4qDagm48nGplr//lAVqLH9I2TLDVqRFdhqTUaEITFA5Ho/Ovkw=="
       },
       "FsToolkit.ErrorHandling": {
         "type": "CentralTransitive",

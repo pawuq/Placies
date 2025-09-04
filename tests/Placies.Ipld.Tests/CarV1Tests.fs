@@ -21,7 +21,7 @@ let ``carv1-basic`` () : Task =
     let dagCborIpldCodec = DagCborIpldCodec() :> IIpldCodec
     let dagJsonIpldCodec = DagJsonIpldCodec(multiBaseRegistry) :> IIpldCodec
     task {
-        let carStream = File.OpenRead("./car-fixtures/carv1-basic.car")
+        use carStream = File.OpenRead("./car-fixtures/carv1-basic.car")
         let! car = CarV1.readFromStream carStream dagCborIpldCodec CancellationToken.None
         let car = car |> ResultExn.getOk
         let carDataModel = car |> CarV1.toDataModel ipldCodecProvider |> Task.runSynchronously |> Result.getOk

@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="PeterO.Cbor" />
+        <PackageReference Include="CommunityToolkit.HighPerformance" />
     </ItemGroup>
 
 </Project>

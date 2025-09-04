@@ -1,5 +1,7 @@
 namespace Placies.Ipld.Tests
 
+open System
+open System.Buffers
 open System.Collections.Generic
 open System.IO
 open System.Text
@@ -77,19 +79,19 @@ module IpldFixtures =
         output.WriteLine("")
         output.WriteLine("")
 
-        use dataStream = new MemoryStream(fixture.DataBytes)
-        let dataModelNode = codec.TryDecodeAsync(dataStream) |> Task.runSynchronously |> ResultExn.getOk
+        let dataSequence = ReadOnlySequence(fixture.DataBytes)
+        let dataModelNode = codec.TryDecode(dataSequence) |> ResultExn.getOk
 
         output.WriteLine("Decoded DataModel node:")
         output.WriteLine($"%A{dataModelNode}")
         output.WriteLine("")
 
-        use reencodedDataStream = new MemoryStream()
-        let reencodedCid = codec.TryEncodeWithCidAsync(reencodedDataStream, dataModelNode, 1, MultiHashInfos.Sha2_256) |> Task.runSynchronously |> ResultExn.getOk
-        let reencodedDataBytes = reencodedDataStream.ToArray()
+        let reencodedBufferWriter = ArrayBufferWriter()
+        let reencodedCid = codec.TryEncodeWithCid(reencodedBufferWriter, dataModelNode, 1, MultiHashInfos.Sha2_256) |> Task.runSynchronously |> ResultExn.getOk
+        let reencodedDataBytes = reencodedBufferWriter.WrittenSpan
 
         output.WriteLine("Reencoded bytes:")
-        output.WriteLine(reencodedDataBytes.ToHexString())
+        output.WriteLine(Convert.ToHexString(reencodedDataBytes))
         output.WriteLine("")
         output.WriteLine("Reencoded text:")
         output.WriteLine(Encoding.UTF8.GetString(reencodedDataBytes))

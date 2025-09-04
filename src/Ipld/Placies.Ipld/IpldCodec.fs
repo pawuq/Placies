@@ -6,6 +6,7 @@ open System.IO
 open System.IO.Pipelines
 open System.Runtime.InteropServices
 open System.Threading
+open System.Threading.Tasks
 open FsToolkit.ErrorHandling
 open Placies
 open Placies.Utils
@@ -13,43 +14,43 @@ open Placies.Multiformats
 
 type IIpldCodec =
     abstract CodecInfo: MultiCodecInfo
-    abstract TryEncodeAsync: pipeWriter: PipeWriter * dataModelNode: DataModelNode * [<Optional>] ct: CancellationToken -> TaskResult<unit, exn>
-    abstract TryDecodeAsync: pipeReader: PipeReader * [<Optional>] ct: CancellationToken -> TaskResult<DataModelNode, exn>
+    abstract TryEncode: bufferWriter: IBufferWriter<byte> * dataModelNode: DataModelNode -> Result<unit, exn>
+    abstract TryDecode: buffer: ReadOnlySequence<byte> -> Result<DataModelNode, exn>
 
 [<AutoOpen>]
 module CodecExtensions =
 
+    type PipeReader with
+        member this.ReadAllAsync([<Optional>] cancellationToken: CancellationToken): ValueTask<ReadResult> =
+            this.ReadAtLeastAsync(Int32.MaxValue, cancellationToken)
+
     type IIpldCodec with
 
-        member this.TryEncodeAsync(writeToStream: Stream, dataModelNode: DataModelNode, [<Optional>] ct: CancellationToken): TaskResult<unit, exn> = task {
-            return! PipeWriter.usingAsync (PipeWriter.Create(writeToStream)) ^fun pipeWriter ->
-                this.TryEncodeAsync(pipeWriter, dataModelNode, ct)
+        member this.TryEncodeAsync(writeToStream: Stream, dataModelNode: DataModelNode): TaskResult<unit, exn> = task {
+            return! PipeWriter.usingAsync (PipeWriter.Create(writeToStream)) ^fun pipeWriter -> taskResult {
+                return! this.TryEncode(pipeWriter, dataModelNode)
+            }
         }
         member this.TryDecodeAsync(stream: Stream, [<Optional>] ct: CancellationToken): TaskResult<DataModelNode, exn> = task {
-            return! PipeReader.usingAsync (PipeReader.Create(stream)) ^fun pipeReader ->
-                this.TryDecodeAsync(pipeReader, ct)
+            return! PipeReader.usingAsync (PipeReader.Create(stream)) ^fun pipeReader -> task {
+                let! readResult = pipeReader.ReadAllAsync(ct)
+                let res = this.TryDecode(readResult.Buffer)
+                pipeReader.AdvanceTo(readResult.Buffer.Start, readResult.Buffer.End)
+                return res
+            }
         }
 
-        member this.TryEncodeWithCidAsync(pipeWriter: PipeWriter, dataModelNode: DataModelNode, cidVersion: int, cidMultihashInfo: MultiHashInfo, [<Optional>] ct: CancellationToken): TaskResult<Cid, exn> = taskResult {
-            use memoryStream = new MemoryStream()
+        member this.TryEncodeWithCid(bufferWriter: IBufferWriter<byte>, dataModelNode: DataModelNode, cidVersion: int, cidMultihashInfo: MultiHashInfo): TaskResult<Cid, exn> = taskResult {
+            let arrayBufferWriter = ArrayBufferWriter<byte>()
+            do! this.TryEncode(arrayBufferWriter, dataModelNode)
+            bufferWriter.Write(arrayBufferWriter.WrittenSpan)
 
-            let memoryStreamPipeWriter = PipeWriter.Create(memoryStream, StreamPipeWriterOptions(leaveOpen=true))
-            do! this.TryEncodeAsync(memoryStreamPipeWriter, dataModelNode, ct)
-            do! memoryStreamPipeWriter.CompleteAsync()
-            memoryStream.Seek(0, SeekOrigin.Begin) |> ignore
-            memoryStream.CopyTo(pipeWriter.AsStream())
-
-            memoryStream.Seek(0, SeekOrigin.Begin) |> ignore
-            let multihash = MultiHash.computeFromStream memoryStream cidMultihashInfo
+            let multihash = MultiHash.computeFromBytes arrayBufferWriter.WrittenSpan cidMultihashInfo
             let cid = Cid.create cidVersion this.CodecInfo.Code multihash
             return cid
         }
-        member this.TryEncodeWithCidAsync(writeToStream: Stream, dataModelNode: DataModelNode, cidVersion: int, cidMultihashInfo: MultiHashInfo, [<Optional>] ct: CancellationToken): TaskResult<Cid, exn> = task {
-            return! PipeWriter.usingAsync (PipeWriter.Create(writeToStream)) ^fun pipeWriter ->
-                this.TryEncodeWithCidAsync(pipeWriter, dataModelNode, cidVersion, cidMultihashInfo, ct)
-        }
-
-        member this.TryDecodeAsync(buffer: ReadOnlyMemory<byte>, [<Optional>] ct: CancellationToken): TaskResult<DataModelNode, exn> = task {
-            return! PipeReader.usingAsync (PipeReader.Create(ReadOnlySequence(buffer))) ^fun pipeReader ->
-                this.TryDecodeAsync(pipeReader, ct)
+        member this.TryEncodeWithCidAsync(writeToStream: Stream, dataModelNode: DataModelNode, cidVersion: int, cidMultihashInfo: MultiHashInfo): TaskResult<Cid, exn> = task {
+            return! PipeWriter.usingAsync (PipeWriter.Create(writeToStream)) ^fun pipeWriter -> taskResult {
+                return! this.TryEncodeWithCid(pipeWriter, dataModelNode, cidVersion, cidMultihashInfo)
+            }
         }

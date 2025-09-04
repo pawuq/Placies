@@ -6,6 +6,7 @@ open System.IO
 open FsToolkit.ErrorHandling
 open Placies.Ipld
 open Placies.Multiformats
+open Placies.Utils
 
 // https://ipld.io/specs/codecs/dag-pb/spec/
 
@@ -93,23 +94,21 @@ type DagPbIpldCodec() =
     interface IIpldCodec with
         member this.CodecInfo = MultiCodecInfos.DagPb
 
-        member this.TryDecodeAsync(pipeReader, ct) = taskResult {
-            use memoryStream = new MemoryStream()
-            do! pipeReader.CopyToAsync(memoryStream, ct)
-            let mutable buffer = ReadOnlyMemory(memoryStream.ToArray())
-            let! pbNode = DagPbDecode.decodeNode buffer
+        member this.TryDecode(buffer) = result {
+            let buffer' =
+                if buffer.IsSingleSegment then
+                    buffer.First
+                else
+                    let buffer' = Array.zeroCreate<byte> (int buffer.Length) // TODO: Optimize
+                    buffer.CopyTo(buffer')
+                    buffer'.AsReadOnlyMemory()
+            let! pbNode = DagPbDecode.decodeNode buffer'
             return DagPb.pbNodeToDataModel pbNode
         }
 
-        member this.TryEncodeAsync(pipeWriter, dataModelNode, ct) = taskResult {
+        member this.TryEncode(bufferWriter, dataModelNode) = result {
             let! pbNode =
                 DagPb.parseDataModelToPbNode dataModelNode
                 |> Result.mapError (fun errs -> AggregateException("Invalid dag-pb data model", errs |> Seq.map exn) :> exn)
-            let bufferWriter = ArrayBufferWriter()
             DagPbEncode.writeNode pbNode bufferWriter
-            let! flushResult = pipeWriter.WriteAsync(bufferWriter.WrittenMemory, ct)
-            if flushResult.IsCanceled then
-                raise (OperationCanceledException())
-            // TODO?: Handle flushResult.IsCompleted
-            return ()
         }

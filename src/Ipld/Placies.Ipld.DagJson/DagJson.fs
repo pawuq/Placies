@@ -102,18 +102,23 @@ module DagJson =
             Error $"Invalid JsonNode: %A{jsonNode}"
 
 type DagJsonIpldCodec(multibaseProvider: IMultiBaseProvider) =
+    let jsonSerializerOptions = JsonSerializerOptions(
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    )
+    let jsonWriterOptions = JsonWriterOptions(
+        Indented = false,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    )
     interface IIpldCodec with
         member _.CodecInfo = MultiCodecInfos.DagJson
 
-        member this.TryEncodeAsync(pipeWriter, dataModelNode, ct) = taskResult {
-            let! jsonNode = DagJson.tryEncode dataModelNode |> Result.mapError exn
-            let jsonSerializerOptions = JsonSerializerOptions(
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            )
-            do! JsonSerializer.SerializeAsync(pipeWriter.AsStream(), jsonNode, jsonSerializerOptions, ct)
-        }
+        member this.TryDecode(buffer) =
+            let mutable jsonReader = Utf8JsonReader(buffer)
+            let jsonNode = JsonSerializer.Deserialize<JsonNode>(&jsonReader, jsonSerializerOptions)
+            DagJson.tryDecode multibaseProvider jsonNode |> Result.mapError exn
 
-        member this.TryDecodeAsync(pipeReader, ct) = taskResult {
-            let! jsonNode = JsonSerializer.DeserializeAsync<JsonNode>(pipeReader.AsStream(), cancellationToken=ct)
-            return! DagJson.tryDecode multibaseProvider jsonNode |> Result.mapError exn
+        member this.TryEncode(bufferWriter, dataModelNode) = result {
+            let! jsonNode = DagJson.tryEncode dataModelNode |> Result.mapError exn
+            use jsonWriter = new Utf8JsonWriter(bufferWriter, jsonWriterOptions)
+            JsonSerializer.Serialize<JsonNode>(jsonWriter, jsonNode, jsonSerializerOptions)
         }

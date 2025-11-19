@@ -34,12 +34,12 @@ module DagPb =
 
     let parseDataModelToPbLink (dataModelNode: DataModelNode) : Validation<PBLink, _> = validation {
         let! hash = validation {
-            let! hash = dataModelNode |> DataModelNode.tryAsMapAndFindField (DataModelNode.String "Hash") |> Result.requireSome "No 'Hash' field"
+            let! hash = dataModelNode |> DataModelNode.tryAsMapAndFindField "Hash" |> Result.requireSome "No 'Hash' field"
             let! hash = hash |> DataModelNode.tryAsLink |> Result.requireSome "'Hash' field is not Link"
             return hash
         }
         and! name = validation {
-            let name = dataModelNode |> DataModelNode.tryAsMapAndFindField (DataModelNode.String "Name")
+            let name = dataModelNode |> DataModelNode.tryAsMapAndFindField "Name"
             match name with
             | None -> return ValueNone
             | Some name ->
@@ -47,7 +47,7 @@ module DagPb =
                 return ValueSome name
         }
         and! tsize = validation {
-            let tsize = dataModelNode |> DataModelNode.tryAsMapAndFindField (DataModelNode.String "Tsize")
+            let tsize = dataModelNode |> DataModelNode.tryAsMapAndFindField "Tsize"
             match tsize with
             | None -> return ValueNone
             | Some tsize ->
@@ -63,7 +63,7 @@ module DagPb =
 
     let parseDataModelToPbNode (dataModelNode: DataModelNode) : Validation<PBNode, _> = validation {
         let! links = validation {
-            let! links = dataModelNode |> DataModelNode.tryAsMapAndFindField (DataModelNode.String "Links") |> Result.requireSome "No 'Links' field"
+            let! links = dataModelNode |> DataModelNode.tryAsMapAndFindField "Links" |> Result.requireSome "No 'Links' field"
             let! links = links |> DataModelNode.tryAsList |> Result.requireSome "'Links' field is not List"
             let! pbLinks =
                 links
@@ -77,7 +77,7 @@ module DagPb =
             return pbLinks
         }
         and! data = validation {
-            let data = dataModelNode |> DataModelNode.tryAsMapAndFindField (DataModelNode.String "Data")
+            let data = dataModelNode |> DataModelNode.tryAsMapAndFindField "Data"
             match data with
             | None -> return ValueNone
             | Some data ->

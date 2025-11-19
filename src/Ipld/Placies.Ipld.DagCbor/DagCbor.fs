@@ -40,7 +40,6 @@ module DagCbor =
                 map
                 |> Map.toList
                 |> List.traverseResultM ^fun (k, v) -> result {
-                    let! k = k |> function DataModelNode.String k -> Ok k | _ -> Error "Key can be only String"
                     let! v = tryEncode v
                     return k, v
                 }
@@ -88,7 +87,7 @@ module DagCbor =
                 cbor.Entries
                 |> Seq.toList
                 |> List.traverseResultM ^fun (KeyValue (key, value)) ->
-                    tryDecode value |> Result.map (fun v -> DataModelNode.String (key.AsString()), v)
+                    tryDecode value |> Result.map (fun v -> key.AsString(), v)
                 |> Result.map (Map.ofList >> DataModelNode.Map)
         | _ ->
             return! Error $"Invalid CBOR: %A{cbor}"

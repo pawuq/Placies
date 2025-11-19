@@ -40,7 +40,6 @@ module DagJson =
                 map
                 |> Map.toList
                 |> List.traverseResultM ^fun (k, v) -> result {
-                    let! k = k |> function DataModelNode.String k -> Ok k | _ -> Error "Key can be only String"
                     let! v = tryEncode v
                     return k, v
                 }
@@ -91,7 +90,7 @@ module DagJson =
                 jsonObject
                 |> Seq.toList
                 |> List.traverseResultM ^fun (KeyValue (key, value)) ->
-                    tryDecode value |> Result.map (fun value -> DataModelNode.String key, value)
+                    tryDecode value |> Result.map (fun value -> key, value)
                 |> Result.map (Map.ofList >> DataModelNode.Map)
         | :? JsonArray as jsonArray ->
             jsonArray

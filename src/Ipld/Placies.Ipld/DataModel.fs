@@ -23,7 +23,7 @@ type DataModelNode =
     | String of string
     | Bytes of byte array
     | List of DataModelNode list
-    | Map of Map<DataModelNode, DataModelNode>
+    | Map of Map<string, DataModelNode>
     | Link of Cid
 
 [<RequireQualifiedAccess>]
@@ -61,7 +61,7 @@ module DataModelNode =
         | DataModelNode.Bytes bytes -> bytes |> Some
         | _ -> None
 
-    let tryAsMap (node: DataModelNode) : Map<DataModelNode, DataModelNode> option =
+    let tryAsMap (node: DataModelNode) : Map<string, DataModelNode> option =
         match node with
         | DataModelNode.Map map -> map |> Some
         | _ -> None
@@ -76,7 +76,7 @@ module DataModelNode =
         | DataModelNode.Link cid -> cid |> Some
         | _ -> None
 
-    let tryAsMapAndFindField (key: DataModelNode) (node: DataModelNode) : DataModelNode option =
+    let tryAsMapAndFindField (key: string) (node: DataModelNode) : DataModelNode option =
         node |> tryAsMap |> Option.bind (Map.tryFind key)
 
 

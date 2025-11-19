@@ -40,13 +40,13 @@ module CarV1 =
 
     let parseHeader (dataModelNode: DataModelNode) : Validation<CarV1Header, _> = validation {
         let! version = validation {
-            let! version = dataModelNode |> DataModelNode.tryAsMapAndFindField (DataModelNode.String "version") |> Result.requireSome "No 'version' field"
+            let! version = dataModelNode |> DataModelNode.tryAsMapAndFindField "version" |> Result.requireSome "No 'version' field"
             let! version = version |> DataModelNode.tryAsInteger |> Result.requireSome "'version' field is not Integer"
             return int32<int64> version
         }
         do! version |> Result.requireEqualTo 1 "Version must be 1"
         let! roots = validation {
-            let! roots = dataModelNode |> DataModelNode.tryAsMapAndFindField (DataModelNode.String "roots") |> Result.requireSome "No 'roots' field"
+            let! roots = dataModelNode |> DataModelNode.tryAsMapAndFindField "roots" |> Result.requireSome "No 'roots' field"
             let! roots = roots |> DataModelNode.tryAsList |> Result.requireSome "'roots' field is not List"
             let! roots =
                 roots

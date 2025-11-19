@@ -1,12 +1,12 @@
 {
   "version": 2,
   "dependencies": {
-    "net8.0": {
+    "net10.0": {
       "CommunityToolkit.HighPerformance": {
         "type": "Direct",
-        "requested": "[8.3.2, )",
-        "resolved": "8.3.2",
-        "contentHash": "1Os81ua0FmIOtiSgOk5C1KBraQ3SDfxs/7BG4qDagm48nGplr//lAVqLH9I2TLDVqRFdhqTUaEITFA5Ho/Ovkw=="
+        "requested": "[8.4.0, )",
+        "resolved": "8.4.0",
+        "contentHash": "flxspiBs0G/0GMp7IK2J2ijV9bTG6hEwFc/z6ekHqB6nwRJ4Ry2yLdx+TkbCUYFCl4XhABkAwomeKbT6zM2Zlg=="
       },
       "FSharp.Control.TaskSeq": {
         "type": "Direct",
@@ -19,15 +19,15 @@
       },
       "FSharp.Core": {
         "type": "Direct",
-        "requested": "[8.0.401, )",
-        "resolved": "8.0.401",
-        "contentHash": "pvmquLrs82m8WqWB49Gj+hsmnWURkUbc++pJ0P2NdrEv1ZVVrhDNjSiFNP4wW4HiTowwaRhjiBc5IKNV35Vf/A=="
+        "requested": "[10.0.100, )",
+        "resolved": "10.0.100",
+        "contentHash": "c/r6T/HE9MWL0O0OispLtaKhVwDsiYQlLS249LoxSo1HNH/wfc0f5DE4pI6WpTXkCEdeXa66K5f9FmKLr/0cmw=="
       },
       "System.IO.Pipelines": {
         "type": "Direct",
-        "requested": "[8.0.0, )",
-        "resolved": "8.0.0",
-        "contentHash": "FHNOatmUq0sqJOkTx+UF/9YK1f180cnW5FVqnQMvYUN0elp6wFzbtPSiqbo1/ru8ICp43JM1i7kKkk6GsNGHlA=="
+        "requested": "[10.0.0, )",
+        "resolved": "10.0.0",
+        "contentHash": "M1eb3nfXntaRJPrrMVM9EFS8I1bDTnt0uvUS6QP/SicZf/ZZjydMD5NiXxfmwW/uQwaMDP/yX2P+zQN1NBHChg=="
       },
       "PeterO.Numbers": {
         "type": "Transitive",
@@ -39,15 +39,10 @@
         "resolved": "1.0.0",
         "contentHash": "fpRTBsYACMp7NvTECauYRomubWTC3vUNw4hMXdIedP8ctBGK6tea9HOJwE+qVzis6MZYkL3LIs8qeY3rc6Jdlw=="
       },
-      "System.Memory": {
-        "type": "Transitive",
-        "resolved": "4.5.5",
-        "contentHash": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw=="
-      },
       "placies.cid": {
         "type": "Project",
         "dependencies": {
-          "FSharp.Core": "[8.0.401, )",
+          "FSharp.Core": "[10.0.100, )",
           "Placies.Multiformats.MultiHash": "[1.0.0, )",
           "Placies.Utils": "[1.0.0, )"
         }
@@ -55,18 +50,18 @@
       "placies.ipld": {
         "type": "Project",
         "dependencies": {
-          "FSharp.Core": "[8.0.401, )",
+          "FSharp.Core": "[10.0.100, )",
           "Placies.Cid": "[1.0.0, )",
           "Placies.Multiformats.MultiBase": "[1.0.0, )",
           "Placies.Multifroamts.MultiCodec": "[1.0.0, )",
-          "System.IO.Pipelines": "[8.0.0, )"
+          "System.IO.Pipelines": "[10.0.0, )"
         }
       },
       "placies.ipld.dagcbor": {
         "type": "Project",
         "dependencies": {
-          "CommunityToolkit.HighPerformance": "[8.3.2, )",
-          "FSharp.Core": "[8.0.401, )",
+          "CommunityToolkit.HighPerformance": "[8.4.0, )",
+          "FSharp.Core": "[10.0.100, )",
           "PeterO.Cbor": "[4.5.5, )",
           "Placies.Ipld": "[1.0.0, )"
         }
@@ -74,15 +69,15 @@
       "placies.multiformats.multibase": {
         "type": "Project",
         "dependencies": {
-          "FSharp.Core": "[8.0.401, )",
+          "FSharp.Core": "[10.0.100, )",
           "Placies.Utils": "[1.0.0, )",
-          "SimpleBase": "[4.0.2, )"
+          "SimpleBase": "[5.6.0, )"
         }
       },
       "placies.multiformats.multihash": {
         "type": "Project",
         "dependencies": {
-          "FSharp.Core": "[8.0.401, )",
+          "FSharp.Core": "[10.0.100, )",
           "Placies.Multiformats.MultiBase": "[1.0.0, )",
           "Placies.Multifroamts.MultiCodec": "[1.0.0, )",
           "Placies.Utils": "[1.0.0, )",
@@ -92,41 +87,41 @@
       "placies.multifroamts.multicodec": {
         "type": "Project",
         "dependencies": {
-          "FSharp.Core": "[8.0.401, )",
+          "FSharp.Core": "[10.0.100, )",
           "Placies.Utils": "[1.0.0, )"
         }
       },
       "placies.utils": {
         "type": "Project",
         "dependencies": {
-          "FSharp.Core": "[8.0.401, )",
-          "FsToolkit.ErrorHandling": "[4.17.0, )",
-          "FsToolkit.ErrorHandling.TaskResult": "[4.17.0, )"
+          "FSharp.Core": "[10.0.100, )",
+          "FsToolkit.ErrorHandling": "[5.1.0, )",
+          "FsToolkit.ErrorHandling.TaskResult": "[4.18.0, )"
         }
       },
       "placies.varint": {
         "type": "Project",
         "dependencies": {
-          "FSharp.Core": "[8.0.401, )",
+          "FSharp.Core": "[10.0.100, )",
           "Placies.Utils": "[1.0.0, )"
         }
       },
       "FsToolkit.ErrorHandling": {
         "type": "CentralTransitive",
-        "requested": "[4.17.0, )",
-        "resolved": "4.17.0",
-        "contentHash": "eW37u0mip2bCjXK+z5VJUN1VdRz2QZYVZN1xLwKagrw4IS9jjQSR8P2OW5msE82AShpW2fM9ySEVxtZfoPBTiA==",
+        "requested": "[5.1.0, )",
+        "resolved": "5.1.0",
+        "contentHash": "l1bblQhBLLjoHVVxnxDghT8DBjeDQoN1UEEwryvfAoer599C/hnOo0BPcNVP1SpltaWXTjdUZXZyXj0jF6Onbw==",
         "dependencies": {
-          "FSharp.Core": "7.0.300"
+          "FSharp.Core": "9.0.300"
         }
       },
       "FsToolkit.ErrorHandling.TaskResult": {
         "type": "CentralTransitive",
-        "requested": "[4.17.0, )",
-        "resolved": "4.17.0",
-        "contentHash": "0468/s/OxckJ2RfZBzwAWQzksztA0FlRmHHauBHJ1pYBpHvXevKMowWeJQRfqZp+24whM9DaNzP8fWDScQ8aPA==",
+        "requested": "[4.18.0, )",
+        "resolved": "4.18.0",
+        "contentHash": "XEcsKn7nqISf2JbkuzAIlMPYKmx2fYw8Ufa8hwXsqisKTEVaEWAYG9HG+NRvjEQgw367o/XE8CdcOnEtMBzUwA==",
         "dependencies": {
-          "FsToolkit.ErrorHandling": "4.17.0"
+          "FsToolkit.ErrorHandling": "4.18.0"
         }
       },
       "PeterO.Cbor": {
@@ -141,12 +136,9 @@
       },
       "SimpleBase": {
         "type": "CentralTransitive",
-        "requested": "[4.0.2, )",
-        "resolved": "4.0.2",
-        "contentHash": "sNKHP2Qzy4DafamgH44UGg1YeyHFT08AMgHPraxYt4CVBoHHYD5f0MjbBfdmtGca69xikPU5aV8H+MMP7ZnfIg==",
-        "dependencies": {
-          "System.Memory": "4.5.5"
-        }
+        "requested": "[5.6.0, )",
+        "resolved": "5.6.0",
+        "contentHash": "1nNr/DCvcxTrQzN1gUnYzFpLkbAKcFYhF/aMK34jVxrPUjMwL/J3KNEp89M0WaW2k9FUpacxRe4BmjFFjOv3zw=="
       }
     }
   }

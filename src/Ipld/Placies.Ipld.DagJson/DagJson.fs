@@ -67,7 +67,7 @@ module DagJson =
             |> Option.map Ok
             |> Option.defaultWith ^fun () -> Error $"Invalid JsonValue: %A{jsonValue}"
         | :? JsonObject as jsonObject ->
-            match jsonObject.TryGetPropertyValue("/") |> Option.ofTryByref with
+            match (jsonObject.TryGetPropertyValue("/"): _ * _) |> Option.ofTryByref with
             | Some slashJsonNode ->
                 match slashJsonNode with
                 | :? JsonValue as slashJsonValue ->
@@ -78,7 +78,7 @@ module DagJson =
                     }
                 | :? JsonObject as slashJsonObject ->
                     result {
-                        let! bytesJsonNode = slashJsonObject.TryGetPropertyValue("bytes") |> Option.ofTryByref |> Result.requireSome "Object does not contain 'bytes' field"
+                        let! bytesJsonNode = (slashJsonObject.TryGetPropertyValue("bytes"): _ * _) |> Option.ofTryByref |> Result.requireSome "Object does not contain 'bytes' field"
                         let! bytesJsonValue = bytesJsonNode |> tryUnbox<JsonValue> |> Result.requireSome "Is not JsonValue"
                         let! bytesString = bytesJsonValue.TryGetValue<string>() |> Option.ofTryByref |> Result.requireSome "Is not string"
                         let! bytes = Result.tryWith (fun () -> MultiBaseInfos.Base64.BaseCoder.Decode(bytesString.AsMemory())) |> Result.mapError (fun ex -> $"Invalid Base64: {ex}")

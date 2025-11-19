@@ -87,7 +87,7 @@ module IpldFixtures =
         output.WriteLine("")
 
         let reencodedBufferWriter = ArrayBufferWriter()
-        let reencodedCid = codec.TryEncodeWithCid(reencodedBufferWriter, dataModelNode, 1, MultiHashInfos.Sha2_256) |> Task.runSynchronously |> ResultExn.getOk
+        let reencodedCid = codec.TryEncodeWithCid(reencodedBufferWriter, dataModelNode, 1, MultiHashInfos.Sha2_256) |> ResultExn.getOk
         let reencodedDataBytes = reencodedBufferWriter.WrittenSpan
 
         output.WriteLine("Reencoded bytes:")

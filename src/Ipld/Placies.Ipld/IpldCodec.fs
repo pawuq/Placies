@@ -40,7 +40,7 @@ module CodecExtensions =
             }
         }
 
-        member this.TryEncodeWithCid(bufferWriter: IBufferWriter<byte>, dataModelNode: DataModelNode, cidVersion: int, cidMultihashInfo: MultiHashInfo): TaskResult<Cid, exn> = taskResult {
+        member this.TryEncodeWithCid(bufferWriter: IBufferWriter<byte>, dataModelNode: DataModelNode, cidVersion: int, cidMultihashInfo: MultiHashInfo): Result<Cid, exn> = result {
             let arrayBufferWriter = ArrayBufferWriter<byte>()
             do! this.TryEncode(arrayBufferWriter, dataModelNode)
             bufferWriter.Write(arrayBufferWriter.WrittenSpan)

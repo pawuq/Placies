@@ -2,7 +2,7 @@
   dockerTools,
   placies-allowlist-proxy-gateway,
   busybox,
-  cacert
+  cacert,
 }:
 dockerTools.buildLayeredImage {
   name = "placies-allowlist-proxy-gateway-docker-image";

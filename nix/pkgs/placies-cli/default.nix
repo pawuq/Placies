@@ -3,7 +3,7 @@
   buildDotnetModule,
   dotnetCorePackages,
   nugetPackagesLockToNugetDeps,
-  repoSrc
+  repoSrc,
 }:
 let
   dotnet-sdk = dotnetCorePackages.sdk_10_0;

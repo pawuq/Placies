@@ -4,7 +4,7 @@
   dotnetCorePackages,
   nugetPackagesLockToNugetDeps,
   callPackage,
-  repoSrc
+  repoSrc,
 }:
 let
   dotnet-sdk = dotnetCorePackages.sdk_10_0;
@@ -22,6 +22,8 @@ buildDotnetModule (finalAttrs: {
   };
 
   passthru = {
-    dockerImage = callPackage ./docker-image.nix { placies-allowlist-proxy-gateway = finalAttrs.finalPackage; };
+    dockerImage = callPackage ./docker-image.nix {
+      placies-allowlist-proxy-gateway = finalAttrs.finalPackage;
+    };
   };
 })

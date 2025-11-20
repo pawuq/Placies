@@ -11,7 +11,7 @@
       systems = [ "x86_64-linux" ];
       perSystem = { lib, pkgs, ... }:
         let
-          nugetPackagesLockToNugetDeps = pkgs.callPackage inputs.nuget-packages-lock2nuget-deps.lib.nugetPackagesLockToNugetDeps { inherit nixpkgs; };
+          nugetPackagesLockToNugetDeps = pkgs.callPackage inputs.nuget-packages-lock2nuget-deps.lib.nugetPackagesLockToNugetDeps { };
           # Remove .nix files from src for better build caches
           repoSrc = builtins.path {
             path = ./.;

@@ -28,8 +28,7 @@
           "FSharp.Core": "[10.0.100, )",
           "Placies.Cid": "[1.0.0, )",
           "Placies.Multiformats.MultiBase": "[1.0.0, )",
-          "Placies.Multifroamts.MultiCodec": "[1.0.0, )",
-          "System.IO.Pipelines": "[10.0.0, )"
+          "Placies.Multifroamts.MultiCodec": "[1.0.0, )"
         }
       },
       "placies.multiformats.multibase": {
@@ -95,12 +94,6 @@
         "requested": "[5.6.0, )",
         "resolved": "5.6.0",
         "contentHash": "1nNr/DCvcxTrQzN1gUnYzFpLkbAKcFYhF/aMK34jVxrPUjMwL/J3KNEp89M0WaW2k9FUpacxRe4BmjFFjOv3zw=="
-      },
-      "System.IO.Pipelines": {
-        "type": "CentralTransitive",
-        "requested": "[10.0.0, )",
-        "resolved": "10.0.0",
-        "contentHash": "M1eb3nfXntaRJPrrMVM9EFS8I1bDTnt0uvUS6QP/SicZf/ZZjydMD5NiXxfmwW/uQwaMDP/yX2P+zQN1NBHChg=="
       }
     }
   }

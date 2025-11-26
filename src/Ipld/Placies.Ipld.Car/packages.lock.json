@@ -23,12 +23,6 @@
         "resolved": "10.0.100",
         "contentHash": "c/r6T/HE9MWL0O0OispLtaKhVwDsiYQlLS249LoxSo1HNH/wfc0f5DE4pI6WpTXkCEdeXa66K5f9FmKLr/0cmw=="
       },
-      "System.IO.Pipelines": {
-        "type": "Direct",
-        "requested": "[10.0.0, )",
-        "resolved": "10.0.0",
-        "contentHash": "M1eb3nfXntaRJPrrMVM9EFS8I1bDTnt0uvUS6QP/SicZf/ZZjydMD5NiXxfmwW/uQwaMDP/yX2P+zQN1NBHChg=="
-      },
       "PeterO.Numbers": {
         "type": "Transitive",
         "resolved": "1.8.2",
@@ -53,8 +47,7 @@
           "FSharp.Core": "[10.0.100, )",
           "Placies.Cid": "[1.0.0, )",
           "Placies.Multiformats.MultiBase": "[1.0.0, )",
-          "Placies.Multifroamts.MultiCodec": "[1.0.0, )",
-          "System.IO.Pipelines": "[10.0.0, )"
+          "Placies.Multifroamts.MultiCodec": "[1.0.0, )"
         }
       },
       "placies.ipld.dagcbor": {

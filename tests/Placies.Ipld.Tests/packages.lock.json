@@ -68,10 +68,7 @@
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
         "resolved": "18.0.1",
-        "contentHash": "qT/mwMcLF9BieRkzOBPL2qCopl8hQu6A1P7JWAoj/FMu5i9vds/7cjbJ/LLtaiwWevWLAeD5v5wjQJ/l6jvhWQ==",
-        "dependencies": {
-          "System.Reflection.Metadata": "8.0.0"
-        }
+        "contentHash": "qT/mwMcLF9BieRkzOBPL2qCopl8hQu6A1P7JWAoj/FMu5i9vds/7cjbJ/LLtaiwWevWLAeD5v5wjQJ/l6jvhWQ=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
@@ -91,19 +88,6 @@
         "type": "Transitive",
         "resolved": "1.0.0",
         "contentHash": "fpRTBsYACMp7NvTECauYRomubWTC3vUNw4hMXdIedP8ctBGK6tea9HOJwE+qVzis6MZYkL3LIs8qeY3rc6Jdlw=="
-      },
-      "System.Collections.Immutable": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "AurL6Y5BA1WotzlEvVaIDpqzpIPvYnnldxru8oXJU2yFxFUy3+pNXjXd1ymO+RA0rq0+590Q8gaz2l3Sr7fmqg=="
-      },
-      "System.Reflection.Metadata": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "ptvgrFh7PvWI8bcVqG5rsA/weWM09EnthFHR5SCnS6IN+P4mj6rE1lBDC4U8HL9/57htKAqy4KQ3bBj84cfYyQ==",
-        "dependencies": {
-          "System.Collections.Immutable": "8.0.0"
-        }
       },
       "Validation": {
         "type": "Transitive",
@@ -164,8 +148,7 @@
           "FSharp.Core": "[10.0.100, )",
           "Placies.Cid": "[1.0.0, )",
           "Placies.Multiformats.MultiBase": "[1.0.0, )",
-          "Placies.Multifroamts.MultiCodec": "[1.0.0, )",
-          "System.IO.Pipelines": "[10.0.0, )"
+          "Placies.Multifroamts.MultiCodec": "[1.0.0, )"
         }
       },
       "placies.ipld.car": {
@@ -178,8 +161,7 @@
           "Placies.Ipld": "[1.0.0, )",
           "Placies.Ipld.DagCbor": "[1.0.0, )",
           "Placies.Utils": "[1.0.0, )",
-          "Placies.VarInt": "[1.0.0, )",
-          "System.IO.Pipelines": "[10.0.0, )"
+          "Placies.VarInt": "[1.0.0, )"
         }
       },
       "placies.ipld.dagcbor": {
@@ -309,12 +291,6 @@
         "requested": "[5.6.0, )",
         "resolved": "5.6.0",
         "contentHash": "1nNr/DCvcxTrQzN1gUnYzFpLkbAKcFYhF/aMK34jVxrPUjMwL/J3KNEp89M0WaW2k9FUpacxRe4BmjFFjOv3zw=="
-      },
-      "System.IO.Pipelines": {
-        "type": "CentralTransitive",
-        "requested": "[10.0.0, )",
-        "resolved": "10.0.0",
-        "contentHash": "M1eb3nfXntaRJPrrMVM9EFS8I1bDTnt0uvUS6QP/SicZf/ZZjydMD5NiXxfmwW/uQwaMDP/yX2P+zQN1NBHChg=="
       }
     }
   }

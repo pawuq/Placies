@@ -10,7 +10,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.IO.Pipelines" />
         <PackageReference Include="CommunityToolkit.HighPerformance" />
         <PackageReference Include="FSharp.Control.TaskSeq" />
     </ItemGroup>

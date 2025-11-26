@@ -36,6 +36,12 @@
             inherit repoSrc;
           };
 
+          devShells.default = pkgs.mkShell {
+            packages = [
+              pkgs.dotnetCorePackages.sdk_10_0
+            ];
+          };
+
           formatter = pkgs.nixfmt-rfc-style;
         };
     };

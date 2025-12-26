@@ -9,9 +9,14 @@
         <LangVersion>10.0</LangVersion>
     </PropertyGroup>
 
+    <!-- See https://github.com/NuGet/Home/issues/11949 , https://github.com/dotnet/fsharp/issues/18690 -->
     <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.fsproj'">
         <PackageReference Include="FSharp.Core" IsImplicitilyDefined="true" />
     </ItemGroup>
+    <PropertyGroup>
+        <!-- https://github.com/NuGet/Home/issues/14380#issuecomment-3529738221 -->
+        <DisableImplicitLibraryPacksFolder>true</DisableImplicitLibraryPacksFolder>
+    </PropertyGroup>
 
     <!--
         Set `Version` property from `/release-version.txt`.
